@@ -1,8 +1,7 @@
 /*
-	graph
-	This problem requires you to implement a basic graph functio
+    graph
+    This problem requires you to implement a basic graph functio
 */
-// I AM NOT DONE
 
 use std::collections::{HashMap, HashSet};
 use std::fmt;
@@ -13,6 +12,7 @@ impl fmt::Display for NodeNotInGraph {
         write!(f, "accessing a node that is not in the graph")
     }
 }
+#[derive(Debug)]
 pub struct UndirectedGraph {
     adjacency_table: HashMap<String, Vec<(String, i32)>>,
 }
@@ -29,7 +29,15 @@ impl Graph for UndirectedGraph {
         &self.adjacency_table
     }
     fn add_edge(&mut self, edge: (&str, &str, i32)) {
-        //TODO
+        let (u, v, val) = edge;
+        self.adjacency_table_mutable()
+            .entry(String::from(u))
+            .or_insert(Vec::new())
+            .push((String::from(v), val));
+        self.adjacency_table_mutable()
+            .entry(String::from(v))
+            .or_insert(Vec::new())
+            .push((String::from(u), val));
     }
 }
 pub trait Graph {
@@ -37,11 +45,18 @@ pub trait Graph {
     fn adjacency_table_mutable(&mut self) -> &mut HashMap<String, Vec<(String, i32)>>;
     fn adjacency_table(&self) -> &HashMap<String, Vec<(String, i32)>>;
     fn add_node(&mut self, node: &str) -> bool {
-        //TODO
-		true
+        self.adjacency_table_mutable()
+            .insert(String::from(node), Vec::new())
+            .is_some()
     }
     fn add_edge(&mut self, edge: (&str, &str, i32)) {
-        //TODO
+        let (u, v, val) = edge;
+        self.add_node(u);
+        self.add_node(v);
+        self.adjacency_table_mutable()
+            .entry(String::from(u))
+            .or_insert(Vec::new())
+            .push((String::from(v), val));
     }
     fn contains(&self, node: &str) -> bool {
         self.adjacency_table().get(node).is_some()
@@ -77,6 +92,7 @@ mod test_undirected_graph {
             (&String::from("b"), &String::from("c"), 10),
             (&String::from("c"), &String::from("b"), 10),
         ];
+        // println!("{:?}", graph);
         for edge in expected_edges.iter() {
             assert_eq!(graph.edges().contains(edge), true);
         }
